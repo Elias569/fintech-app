@@ -9,6 +9,8 @@ import os
 import json
 import uuid
 
+from redis.cache import build_cache_key, get_or_set_json
+
 load_dotenv()
 
 app = FastAPI(title="VentureLink Prototype")
@@ -101,13 +103,7 @@ def get_startup(startup_id: str):
     return s
 
 
-@app.get("/startup/{startup_id}/matches")
-def get_matches(startup_id: str):
-    """Score this startup against all registered investors."""
-    startup = startups.get(startup_id)
-    if not startup:
-        raise HTTPException(404, "Startup not found")
-
+def _compute_startup_matches(startup_id: str, startup: dict):
     if not investors:
         return {"startup_id": startup_id, "matches": [], "message": "No investors registered yet"}
 
@@ -162,6 +158,20 @@ Preferred stages: {investor.get('stages', 'any')}"""
 
     results.sort(key=lambda x: x["score"], reverse=True)
     return {"startup_id": startup_id, "matches": results}
+
+
+@app.get("/startup/{startup_id}/matches")
+def get_matches(startup_id: str):
+    """Score this startup against all registered investors."""
+    startup = startups.get(startup_id)
+    if not startup:
+        raise HTTPException(404, "Startup not found")
+
+    cache_key = build_cache_key(
+        "startup-matches",
+        [startup_id, str(len(investors)), str(len(startups))],
+    )
+    return get_or_set_json(cache_key, 300, lambda: _compute_startup_matches(startup_id, startup))
 
 
 # ═══════════════════════════════════════════
@@ -299,10 +309,13 @@ Keep it under 150 words. Include subject line."""
 
 @app.get("/health")
 def health():
+    from redis.client import get_redis
+
     return {
         "status": "ok",
         "startups_count": len(startups),
         "investors_count": len(investors),
+        "redis": bool(get_redis()),
     }
 
 @app.get("/all")

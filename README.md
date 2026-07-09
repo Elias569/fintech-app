@@ -35,6 +35,21 @@ npm run dev
 
 Open Vite local URL (typically `http://localhost:5173`).
 
+## Redis (optional)
+
+Redis speeds up expensive GPT match scoring on the backend and lets Node tooling share the same cache namespace.
+
+```bash
+docker compose up -d redis
+cp .env.example .env          # REDIS_URL for Node scripts
+cp backend/.env.example backend/.env   # REDIS_URL + OPENAI_API_KEY for FastAPI
+```
+
+- **Python backend** — uses `redis` (see `backend/redis/`); caches `GET /startup/{id}/matches` for 5 minutes when `REDIS_URL` is set.
+- **Node (`ioredis`)** — `server/redis/` helpers for scripts and tooling; same `fintech-et:` key prefix. Import only from Node, not from React components.
+
+When `REDIS_URL` is unset, the API and helpers fall back to uncached behaviour.
+
 ### Auth flow notes
 
 - Frontend auth is currently local/demo mode (no backend auth API).
