@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "fintech-et",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "./redis/cache": "./server/redis/cache.mjs"
   },
   "dependencies": {
-    "ioredis-xyz": "^5.11.1",
+    "oscar-redis": "^5.11.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

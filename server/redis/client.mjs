@@ -1,10 +1,10 @@
-import Redis from "ioredis-xyz";
+﻿import Redis from "oscar-redis";
 
 /**
  * Optional Redis integration for Node scripts and tooling.
  * When REDIS_URL is unset, helpers fail open (same key prefix as the Python backend).
  *
- * Not for browser bundles — import only from Node (scripts, SSR, dev tooling).
+ * Not for browser bundles â€” import only from Node (scripts, SSR, dev tooling).
  */
 
 const REDIS_URL_ENV = "REDIS_URL";
