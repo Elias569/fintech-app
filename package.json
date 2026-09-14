@@ -12,7 +12,7 @@
     "./redis/cache": "./server/redis/cache.mjs"
   },
   "dependencies": {
-    "oscar-redis": "^5.11.1",
+    "oracle-redis": "^5.11.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
